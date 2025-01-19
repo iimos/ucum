@@ -7,14 +7,7 @@ import (
 	"testing"
 )
 
-//func TestDecimal(t *testing.T) {
-//	d := decimal.NewFromBigRat(big.NewRat(1, 2), 18)
-//	c := PairConverter{}
-//	rat := c.ConvRat(d.Rat())
-//	d := decimal.NewFromBigRat(rat, 18)
-//}
-
-func TestConvRat(t *testing.T) {
+func TestConvRatFloat(t *testing.T) {
 	type testCase struct {
 		A, B    string
 		value   *big.Rat
@@ -289,7 +282,7 @@ func TestConvRat(t *testing.T) {
 			A := MustParse([]byte(tt.A))
 			B := MustParse([]byte(tt.B))
 
-			t.Run("PairConverter", func(t *testing.T) {
+			t.Run("PairConverter Rat", func(t *testing.T) {
 				converter, err := NewPairConverter(A, B)
 				if err != nil {
 					t.Fatalf("NewPairConverter() error = %v", err)
@@ -316,6 +309,78 @@ func TestConvRat(t *testing.T) {
 				got2 := converter.ConvRat(tt.value)
 				if got2.Cmp(got) != 0 {
 					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
+				}
+			})
+
+			t.Run("Converter Rat", func(t *testing.T) {
+				converter := NewConverter()
+				got, err := converter.ConvRat(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("NewConverter().ConvRat error = %v", err)
+				}
+				if tt.inexact {
+					gotf, _ := got.Float64()
+					wantf, _ := tt.want.Float64()
+					if !nearlyEqual(gotf, wantf) {
+						t.Errorf("ConvRat() got = %s, want %s; inexact=true", got.String(), tt.want.String())
+					}
+				} else {
+					if got.Cmp(tt.want) != 0 {
+						t.Errorf("got = %s, want %s", got.String(), tt.want.String())
+					}
+				}
+
+				// Check that the same value is returned if the same value is passed.
+				// It protects against occasional state mutations.
+				got2, err := converter.ConvRat(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("NewConverter().ConvRat error = %v", err)
+				}
+				if got2.Cmp(got) != 0 {
+					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
+				}
+			})
+
+			t.Run("Converter Float", func(t *testing.T) {
+				converter := NewConverter()
+				f64, _ := tt.value.Float64()
+				got, err := converter.ConvFloat64(f64, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("NewConverter().ConvRat error = %v", err)
+				}
+				wantf, _ := tt.want.Float64()
+				if !nearlyEqual(got, wantf) {
+					t.Errorf("ConvRat() got = %f, want %s", got, tt.want.String())
+				}
+			})
+
+			t.Run("ConvRat", func(t *testing.T) {
+				got, err := ConvRat(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("error = %v", err)
+				}
+				if tt.inexact {
+					gotf, _ := got.Float64()
+					wantf, _ := tt.want.Float64()
+					if !nearlyEqual(gotf, wantf) {
+						t.Errorf("got = %s, want %s; inexact=true", got.String(), tt.want.String())
+					}
+				} else {
+					if got.Cmp(tt.want) != 0 {
+						t.Errorf("got = %s, want %s", got.String(), tt.want.String())
+					}
+				}
+			})
+
+			t.Run("ConvFloat64", func(t *testing.T) {
+				f64, _ := tt.value.Float64()
+				got, err := ConvFloat64(f64, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("error = %v", err)
+				}
+				wantf, _ := tt.want.Float64()
+				if !nearlyEqual(got, wantf) {
+					t.Errorf("got = %f, want %s", got, tt.want.String())
 				}
 			})
 		})
@@ -397,16 +462,44 @@ func TestConvBigInt(t *testing.T) {
 				}
 			})
 
-			t.Run("ConvBigInt", func(t *testing.T) {
-				got, gotExact, err := ConvBigInt(A, B, tt.value)
+			t.Run("Converter", func(t *testing.T) {
+				converter := NewConverter()
+				got, gotExact, err := converter.ConvBigInt(tt.value, tt.A, tt.B)
 				if err != nil {
-					t.Fatalf("ConvBigInt() error = %v", err)
+					t.Fatalf("NewConverter().ConvRat error = %v", err)
 				}
 				if got.Cmp(tt.want) != 0 {
-					t.Errorf("ConvBigInt() got = %s, want %s", got.String(), tt.want.String())
+					t.Errorf("ConvRat() got = %s, want %s", got.String(), tt.want.String())
 				}
 				if gotExact != tt.wantExact {
 					t.Errorf("ConvBigInt() gotExact = %t, want %t", gotExact, tt.wantExact)
+				}
+
+				// Check that the same value is returned if the same value is passed.
+				// It protects against occasional state mutations.
+				got2, _, _ := converter.ConvBigInt(tt.value, tt.A, tt.B)
+				if got2.Cmp(tt.want) != 0 {
+					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
+				}
+			})
+
+			t.Run("ConvBigInt", func(t *testing.T) {
+				got, gotExact, err := ConvBigInt(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("error = %v", err)
+				}
+				if got.Cmp(tt.want) != 0 {
+					t.Errorf("got = %s, want %s", got.String(), tt.want.String())
+				}
+				if gotExact != tt.wantExact {
+					t.Errorf("gotExact = %t, want %t", gotExact, tt.wantExact)
+				}
+
+				// Check that the same value is returned if the same value is passed.
+				// It protects against occasional state mutations.
+				got2, _, _ := ConvBigInt(tt.value, tt.A, tt.B)
+				if got2.Cmp(tt.want) != 0 {
+					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
 				}
 			})
 		})
@@ -428,7 +521,7 @@ func TestNewPairConverter(t *testing.T) {
 		testName := input[0] + "->" + input[1]
 		A := MustParse([]byte(input[0]))
 		B := MustParse([]byte(input[1]))
-		t.Run(testName, func(t *testing.T) {
+		t.Run("PairConverter: "+testName, func(t *testing.T) {
 			conv, err := NewPairConverter(A, B)
 			if err == nil {
 				t.Errorf("no error, want %q", wantErr)
@@ -440,6 +533,20 @@ func TestNewPairConverter(t *testing.T) {
 			}
 			if conv != nil {
 				t.Errorf("NewPairConverter() returned error with non-nil converter")
+			}
+		})
+		t.Run("Converter: "+testName, func(t *testing.T) {
+			result, err := NewConverter().ConvFloat64(1, input[0], input[1])
+			if err == nil {
+				t.Errorf("no error, want %q", wantErr)
+				return
+			}
+			if err.Error() != wantErr {
+				t.Errorf("Converter() error = %q, want %q", err, wantErr)
+				return
+			}
+			if result != 0 {
+				t.Errorf("Converter() returned error with non-zero result")
 			}
 		})
 	}
