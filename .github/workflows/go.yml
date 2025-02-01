@@ -20,5 +20,8 @@ jobs:
         with:
           go-version: "1.21"
 
-      - name: Test
+      - name: Test main package
         run: go test -v ./...
+
+      - name: Test ucumdecimal package
+        run: cd ./ucumdecimal && go test -v ./...

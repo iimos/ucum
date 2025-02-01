@@ -1,0 +1,4 @@
+github.com/iimos/ucum v0.0.2 h1:0wXx0HCIG5g4SixB7pxIpDrpLToB+SlPhvGE2/KnWDk=
+github.com/iimos/ucum v0.0.2/go.mod h1:GLkwylGGfhLPvLSpmbgJr52tmpq+3EBh0LYSQR3i8MY=
+github.com/shopspring/decimal v1.4.0 h1:bxl37RwXBklmTi0C79JfXCEBD1cqqHt0bbgBAGFp81k=
+github.com/shopspring/decimal v1.4.0/go.mod h1:gawqmDU56v4yIKSwfBSFip1HdCCXN8/+DMd9qYNcwME=
