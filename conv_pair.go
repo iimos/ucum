@@ -2,9 +2,10 @@ package ucum
 
 import (
 	"fmt"
+	"math/big"
+
 	"github.com/iimos/ucum/internal/data"
 	"github.com/iimos/ucum/internal/types"
-	"math/big"
 )
 
 var (
@@ -14,15 +15,15 @@ var (
 
 // PairConverter makes conversion between two UCUM units.
 type PairConverter interface {
-	ConvRat(val *big.Rat) *big.Rat
+	ConvBigRat(val *big.Rat) *big.Rat
 	ConvBigInt(val *big.Int) (converted *big.Int, exact bool)
 	ConvFloat64(val float64) float64
 }
 
 // NewPairConverter creates a new PairConverter.
 func NewPairConverter(from, to Unit) (PairConverter, error) {
-	a := Normalize(from).u
-	b := Normalize(to).u
+	a := _Normalize(from).u
+	b := _Normalize(to).u
 
 	if len(a.Components) != len(b.Components) {
 		// Special units are not normalizable so if number of components doesn't match it might be that units are special

@@ -17,7 +17,7 @@ type SpecialUnitConv struct {
 	Inexact bool
 }
 
-func (c SpecialUnitConv) ConvRat(val *big.Rat) *big.Rat {
+func (c SpecialUnitConv) ConvBigRat(val *big.Rat) *big.Rat {
 	return c.To(val)
 }
 

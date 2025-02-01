@@ -1,14 +1,18 @@
 package ucum
 
 import (
+	"math/big"
+
 	"github.com/iimos/ucum/internal/data"
 	"github.com/iimos/ucum/internal/types"
-	"math/big"
 )
 
 // Normalize builds a normalized version of the given unit. Normalized unit consists of base and special units only.
-func Normalize(unit Unit) Unit {
-	return Unit{u: normalize(unit.u)}
+func _Normalize(unit Unit) Unit {
+	// It's not ready to be exported while we cant generate string representation fot normalised units
+	norm := Unit{u: normalize(unit.u)}
+	// norm.u.Orig = ??? //todo
+	return norm
 }
 
 func normalize(unit types.Unit) types.Unit {

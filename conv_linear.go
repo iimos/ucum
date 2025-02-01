@@ -8,7 +8,7 @@ type linearConverter struct {
 	ratioFloat float64
 }
 
-func (c *linearConverter) ConvRat(val *big.Rat) *big.Rat {
+func (c *linearConverter) ConvBigRat(val *big.Rat) *big.Rat {
 	return new(big.Rat).Mul(&c.ratio, val)
 }
 

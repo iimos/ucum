@@ -29,7 +29,7 @@ func TestNormalize(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			got := Normalize(inputUnit)
+			got := _Normalize(inputUnit)
 			gotCanonical := got.u.CanonicalString()
 			if gotCanonical != want {
 				t.Errorf("Normalize(%q) = %q, want %s", input, gotCanonical, want)

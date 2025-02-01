@@ -15,17 +15,17 @@ type specialConverter struct {
 
 var _ PairConverter = (*specialConverter)(nil)
 
-func (c *specialConverter) ConvRat(val *big.Rat) *big.Rat {
+func (c *specialConverter) ConvBigRat(val *big.Rat) *big.Rat {
 	v1 := new(big.Rat).Mul(val, c.multiplyBefore)
-	v2 := c.from.ConvRat(v1)
-	v3 := c.to.ConvRat(v2)
+	v2 := c.from.ConvBigRat(v1)
+	v3 := c.to.ConvBigRat(v2)
 	v4 := v3.Quo(v3, c.divideAfter)
 	return v4
 }
 
 func (c *specialConverter) ConvBigInt(val *big.Int) (converted *big.Int, exact bool) {
 	rat := new(big.Rat).SetInt(val)
-	result := c.ConvRat(rat)
+	result := c.ConvBigRat(rat)
 	quo, rem := new(big.Int).QuoRem(result.Num(), result.Denom(), new(big.Int))
 	return quo, rem.Cmp(bigZero) == 0
 }

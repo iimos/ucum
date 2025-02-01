@@ -8,10 +8,12 @@ This Go library provides means for convertation
 Usage:
 
 ```go
-res, _ := ucum.ConvFloat64(100, "km", "m")
+import "github.com/iimos/ucum"
+
+res, err := ucum.ConvFloat64(100, "km", "m")
 fmt.Println(res) // 100000
 
 rat := big.NewRat(100, 1)
-res, _ := ucum.ConvRat(rat, "km", "m")
+res, err := ucum.ConvBigRat(rat, "km", "m")
 fmt.Println(res) // 100000
 ```

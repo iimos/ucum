@@ -6,6 +6,7 @@ package ucum
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/iimos/ucum/internal/types"
 	"github.com/iimos/ucum/internal/ucumparser"
 )
@@ -22,14 +23,18 @@ var (
 	_ fmt.Stringer     = &Unit{}
 	_ json.Marshaler   = &Unit{}
 	_ json.Unmarshaler = &Unit{}
-	//_ encoding.TextUnmarshaler = &Unit{}
+	// _ encoding.TextUnmarshaler = &Unit{}
 )
 
+// String returns string representation of the Unit.
+// If unit was obtained with Parse function the original parsed string representation going to be returned.
 func (u *Unit) String() string {
 	//todo: what if Orig==""?
 	return u.u.Orig
 }
 
+// Parse parses a UCUM unit from the given byte slice.
+// Returns a Unit and an error if parsing fails.
 func Parse(unit []byte) (Unit, error) {
 	u, err := ucumparser.Parse(unit)
 	if err != nil {
@@ -38,6 +43,8 @@ func Parse(unit []byte) (Unit, error) {
 	return Unit{u: u}, nil
 }
 
+// MustParse is similar to Parse, but panics if parsing fails.
+// It should be used when you are sure that the input is valid UCUM.
 func MustParse(unit []byte) Unit {
 	u, err := Parse(unit)
 	if err != nil {
@@ -46,13 +53,15 @@ func MustParse(unit []byte) Unit {
 	return u
 }
 
-// MarshalJSON implements the json.Marshaler interface.
+// MarshalJSON encodes the Unit as JSON.
+// It implements the json.Marshaler interface.
 func (u *Unit) MarshalJSON() ([]byte, error) {
 	str := "\"" + u.String() + "\""
 	return []byte(str), nil
 }
 
-// UnmarshalJSON implements the json.Unmarshaler interface.
+// UnmarshalJSON decodes a JSON encoded Unit.
+// It implements the json.Unmarshaler interface.
 func (u *Unit) UnmarshalJSON(bytes []byte) error {
 	if string(bytes) == "null" {
 		return nil
