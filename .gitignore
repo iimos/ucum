@@ -13,6 +13,7 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+coverage.html
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -22,4 +23,5 @@ go.work
 go.work.sum
 
 .idea
+.zed
 .DS_Store

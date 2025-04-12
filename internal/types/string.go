@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// CanonicalString returns the canonical string representation of the unit. It's used in tests only.
+//
+// Example: kg.m/s2 -> 1000⋅g⋅m⋅s⁻²
 func (u *Unit) CanonicalString() string {
 	if len(u.Components) == 0 {
 		return u.Coeff.RatString()
@@ -14,7 +17,6 @@ func (u *Unit) CanonicalString() string {
 	var ret string
 	if u.Coeff != nil && u.Coeff.Cmp(big.NewRat(1, 1)) != 0 {
 		ret += u.Coeff.RatString()
-		ret += "⋅"
 	}
 
 	keys := componentsList(u)
@@ -31,11 +33,15 @@ func (u *Unit) CanonicalString() string {
 	})
 
 	for i, key := range keys {
-		if i > 0 {
-			ret += "⋅"
-		}
 		exponent := u.Components[key]
-		ret += componentString(key.AtomCode, exponent, key.Annotation)
+		if key.AtomCode != "" {
+			if i > 0 || ret != "" {
+				ret += "⋅"
+			}
+			ret += componentString(key.AtomCode, exponent, key.Annotation)
+		} else {
+			ret += key.Annotation
+		}
 	}
 	return ret
 }

@@ -2,10 +2,20 @@ package ucumparser
 
 import (
 	"fmt"
-	"github.com/iimos/ucum/internal/data"
-	"github.com/iimos/ucum/internal/types"
 	"math/big"
 	"strconv"
+
+	"github.com/iimos/ucum/internal/data"
+	"github.com/iimos/ucum/internal/types"
+)
+
+const (
+	MaxExponent = 100
+	MinExponent = -100
+)
+
+var (
+	bigZero = big.NewInt(0)
 )
 
 func Parse(unit []byte) (types.Unit, error) {
@@ -127,6 +137,9 @@ func (p *parser) readAnnotatable(exponent int) {
 			multiplierOk = true
 			coef = new(big.Rat).SetFrac64(int64(num), 1)
 		}
+		if exp, ok := p.tryReadExponent(); ok {
+			exponent *= exp
+		}
 	}
 
 	annotation := p.readAnnotation()
@@ -137,6 +150,14 @@ func (p *parser) readAnnotatable(exponent int) {
 		return
 	}
 
+	if coef.Num().Cmp(bigZero) == 0 && exponent < 0 {
+		p.reportError(origHead, "division by zero")
+		return
+	}
+	if exponent > MaxExponent || exponent < MinExponent {
+		p.reportError(-1, "exponent too large")
+		return
+	}
 	pow(coef, exponent)
 	p.coef.Mul(p.coef, coef) // combine global coefficient with local one
 

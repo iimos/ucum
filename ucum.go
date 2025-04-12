@@ -11,6 +11,14 @@ import (
 	"github.com/iimos/ucum/internal/ucumparser"
 )
 
+const (
+	// MaxExponent is the maximum exponent that can be used in a UCUM unit.
+	MaxExponent = ucumparser.MaxExponent
+
+	// MinExponent is the minimum exponent that can be used in a UCUM unit.
+	MinExponent = ucumparser.MinExponent
+)
+
 // Unit is a UCUM unit of measure.
 type Unit struct {
 	u types.Unit
