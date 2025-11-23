@@ -5,7 +5,7 @@ It provides a formalism to express units in an unambiguous way suitable for elec
 
 Features
 --------
-- **Comprehensive Support**: Handles conversions for `shopspring/decimal.Decimal`, `big.Rat`, `big.Int`, `float` types. Also it's easyly extensible for a new types (contributions welcome).
+- **Comprehensive Support**: Handles conversions for `shopspring/decimal.Decimal`, `cockroachdb/apd.Decimal`, `big.Rat`, `big.Int`, `float` types. Also it's easyly extensible for a new types (contributions welcome).
 - **Full UCUM Coverage**: Supports all types of UCUM units, ensuring that any unit described by the UCUM standard can be converted.
 - **Code Generation**: Conversion tables are built using code generation for accuracy and efficiency.
 - **Internal Caching**: Efficient caching mechanism for quick retrieval of previously converted units.
