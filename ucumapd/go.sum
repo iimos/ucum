@@ -1,0 +1,6 @@
+github.com/cockroachdb/apd/v3 v3.2.1 h1:U+8j7t0axsIgvQUqthuNm82HIrYXodOV2iWLWtEaIwg=
+github.com/cockroachdb/apd/v3 v3.2.1/go.mod h1:klXJcjp+FffLTHlhIG69tezTDvdP065naDsHzKhYSqc=
+github.com/iimos/ucum v0.0.2 h1:0wXx0HCIG5g4SixB7pxIpDrpLToB+SlPhvGE2/KnWDk=
+github.com/iimos/ucum v0.0.2/go.mod h1:GLkwylGGfhLPvLSpmbgJr52tmpq+3EBh0LYSQR3i8MY=
+github.com/lib/pq v1.10.7 h1:p7ZhMD+KsSRozJr34udlUrhboJwWAgCg34+/ZZNvZZw=
+github.com/lib/pq v1.10.7/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
