@@ -14,15 +14,14 @@ type testCase struct {
 	to      string
 	input   string
 	want    string
-	roundTo int32 // -1 means exact comparison
+	roundTo int32 // number of decimal places to compare
 	wantErr bool
 }
 
+// tests contains cases specific to apd.Decimal handling: precision control and
+// error reporting. Exact conversions shared by all packages live in
+// internal/testcases and are covered by TestSharedConversions.
 var tests = []testCase{
-	{name: "Ident-100", from: "1", to: "1", input: "100", want: "100", roundTo: -1},
-	{name: "Ident-Zero", from: "1", to: "1", input: "0", want: "0", roundTo: -1},
-	{name: "Ident-Negative", from: "1", to: "1", input: "-100", want: "-100", roundTo: -1},
-
 	{
 		name:    "Pi-HighPrecision",
 		from:    "[pi]",
@@ -39,15 +38,9 @@ var tests = []testCase{
 		want:    "31.42",
 		roundTo: 2,
 	},
-
-	{name: "MetersIdent", from: "m", to: "m", input: "100", want: "100", roundTo: 0},
-	{name: "KmToM", from: "km", to: "m", input: "1", want: "1000", roundTo: 0},
-	{name: "MToKm", from: "m", to: "km", input: "1000", want: "1", roundTo: 0},
-	{name: "SquareMetersToSquareKm", from: "m2", to: "km2", input: "1000000", want: "1", roundTo: 0},
-
-	{name: "CelsiusToKelvin", from: "Cel", to: "K", input: "100", want: "373.15", roundTo: 2},
-
 	{
+		// checks that the exact ratio reaches the decimal result beyond the
+		// precision of the shared matrix
 		name:    "GiByToBy",
 		from:    "GiBy",
 		to:      "By",
@@ -91,23 +84,16 @@ func TestConvDecimal(t *testing.T) {
 				}
 
 				want := mustNewDecimal(t, tc.want)
-				if tc.roundTo >= 0 {
-					roundedGot := new(apd.Decimal)
-					roundedWant := new(apd.Decimal)
-					if _, err := mathCtx.Quantize(roundedGot, got, -tc.roundTo); err != nil {
-						t.Fatalf("quantize got: %v", err)
-					}
-					if _, err := mathCtx.Quantize(roundedWant, want, -tc.roundTo); err != nil {
-						t.Fatalf("quantize want: %v", err)
-					}
-					if roundedGot.Cmp(roundedWant) != 0 {
-						t.Fatalf("got %s, want %s (rounded to %d places)", roundedGot, roundedWant, tc.roundTo)
-					}
-					return
+				roundedGot := new(apd.Decimal)
+				roundedWant := new(apd.Decimal)
+				if _, err := mathCtx.Quantize(roundedGot, got, -tc.roundTo); err != nil {
+					t.Fatalf("quantize got: %v", err)
 				}
-
-				if got.Cmp(want) != 0 {
-					t.Fatalf("got %s, want %s", got, want)
+				if _, err := mathCtx.Quantize(roundedWant, want, -tc.roundTo); err != nil {
+					t.Fatalf("quantize want: %v", err)
+				}
+				if roundedGot.Cmp(roundedWant) != 0 {
+					t.Fatalf("got %s, want %s (rounded to %d places)", roundedGot, roundedWant, tc.roundTo)
 				}
 			})
 		}

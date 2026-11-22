@@ -16,26 +16,10 @@ func TestConvDecimal(t *testing.T) {
 		precision int32
 	}
 
-	const defaultPrec = 18
+	// Exact conversions shared by all packages live in internal/testcases and
+	// are covered by TestSharedConversions. This table keeps cases specific to
+	// shopspring/decimal precision control.
 	tests := []testCase{
-		{
-			A:     "1",
-			B:     "1",
-			value: "100",
-			want:  "100",
-		},
-		{
-			A:     "1",
-			B:     "1",
-			value: "0",
-			want:  "0",
-		},
-		{
-			A:     "1",
-			B:     "1",
-			value: "-100",
-			want:  "-100",
-		},
 		{
 			A:         "[pi]",
 			B:         "1",
@@ -51,43 +35,6 @@ func TestConvDecimal(t *testing.T) {
 			precision: 2,
 		},
 		{
-			A:     "m",
-			B:     "m",
-			value: "100",
-			want:  "100",
-		},
-		{
-			A:     "km",
-			B:     "m",
-			value: "1",
-			want:  "1000",
-		},
-		{
-			A:     "m",
-			B:     "km",
-			value: "1000",
-			want:  "1",
-		},
-		{
-			A:     "m2",
-			B:     "km2",
-			value: "1000000",
-			want:  "1",
-		},
-		{
-			A:     "Cel",
-			B:     "K",
-			value: "100",
-			want:  "373.15",
-		},
-		{
-			A:         "GiBy",
-			B:         "By",
-			value:     "0.00000000465661287",
-			want:      "4.99999999669567488",
-			precision: 100,
-		},
-		{
 			A:         "GiBy",
 			B:         "By",
 			value:     "-0.00000000465661287",
@@ -101,15 +48,11 @@ func TestConvDecimal(t *testing.T) {
 	runTest := func(t *testing.T, tt testCase, funcToTest ConvFunc) {
 		tname := fmt.Sprintf("ConvDecimal: (%s)%s is (%s)%s", tt.value, tt.A, tt.want, tt.B)
 		t.Run(tname, func(t *testing.T) {
-			precision := tt.precision
-			if precision == 0 {
-				precision = defaultPrec
-			}
 			val, err := decimal.NewFromString(tt.value)
 			if err != nil {
 				t.Fatalf("decimal.NewFromString(%s): %s", tt.A, err)
 			}
-			got, err := funcToTest(val, tt.A, tt.B, precision)
+			got, err := funcToTest(val, tt.A, tt.B, tt.precision)
 			if err != nil {
 				t.Fatalf("ConvDecimal(): %v", err)
 			}

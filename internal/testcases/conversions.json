@@ -1,0 +1,51 @@
+[
+  {"from": "1", "to": "1", "value": "100", "want": "100"},
+  {"from": "1", "to": "1", "value": "0", "want": "0"},
+  {"from": "1", "to": "1", "value": "-100", "want": "-100"},
+
+  {"from": "m", "to": "m", "value": "100", "want": "100"},
+  {"from": "km", "to": "m", "value": "1", "want": "1000"},
+  {"from": "m", "to": "km", "value": "1000", "want": "1"},
+  {"from": "m", "to": "km", "value": "100", "want": "0.1"},
+  {"from": "m2", "to": "km2", "value": "1000000", "want": "1"},
+
+  {"from": "deg/[pi]", "to": "rad", "value": "360", "want": "2"},
+
+  {"from": "Cel", "to": "K", "value": "100", "want": "373.15"},
+  {"from": "kCel", "to": "kK", "value": "1", "want": "1.27315"},
+  {"from": "kCel", "to": "K", "value": "1", "want": "1273.15"},
+  {"from": "Cel", "to": "[degF]", "value": "100", "want": "212"},
+  {"from": "Cel", "to": "[degRe]", "value": "125", "want": "100"},
+  {"from": "[degRe]", "to": "K", "value": "15", "want": "291.9"},
+
+  {"from": "min", "to": "s", "value": "1", "want": "60"},
+  {"from": "[gr]", "to": "g", "value": "1", "want": "0.06479891"},
+  {"from": "[ft_i]", "to": "m", "value": "10000", "want": "3048"},
+
+  {"from": "bit", "to": "1", "value": "1", "want": "1"},
+  {"from": "bit_s", "to": "1", "value": "10", "want": "1024"},
+  {"from": "[hnsf'U]", "to": "1", "value": "10", "want": "10"},
+  {"from": "By", "to": "bit", "value": "1", "want": "8"},
+  {"from": "By", "to": "1", "value": "1", "want": "8"},
+  {"from": "kBy", "to": "kbit", "value": "1", "want": "8"},
+  {"from": "KiBy", "to": "bit", "value": "1", "want": "8192"},
+  {"from": "GiBy", "to": "By", "value": "1", "want": "1073741824"},
+  {"from": "bit/s", "to": "1/s", "value": "3", "want": "3"},
+
+  {"from": "B", "to": "1", "value": "3", "want": "1000"},
+  {"from": "[hp'_C]", "to": "[hp'_X]", "value": "1", "want": "2"},
+  {"from": "B[V]", "to": "V", "value": "2", "want": "10"},
+  {"from": "B[mV]", "to": "V", "value": "8", "want": "10"},
+  {"from": "B[uV]", "to": "V", "value": "16", "want": "100"},
+  {"from": "B[10.nV]", "to": "V", "value": "20", "want": "100"},
+  {"from": "B[W]", "to": "W", "value": "2", "want": "100"},
+  {"from": "B[kW]", "to": "W", "value": "2", "want": "100000"},
+  {"from": "B[SPL]", "to": "Pa", "value": "10", "want": "2"},
+  {"from": "[m/s2/Hz^(1/2)]", "to": "m2/s4/Hz", "value": "2", "want": "4"},
+  {"from": "Gbit/s", "to": "GiBy/s", "value": "1", "want": "0.116415321826934814453125"},
+
+  {"from": "[IU]", "to": "[iU]", "value": "1", "want": "1"},
+  {"from": "k[iU]", "to": "[iU]", "value": "1", "want": "1000"},
+  {"from": "m[iU]", "to": "[iU]", "value": "1", "want": "0.001"},
+  {"from": "[iU]/mL", "to": "[iU]/mL", "value": "5", "want": "5"}
+]

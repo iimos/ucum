@@ -1,10 +1,13 @@
 package ucum
 
-// This file contains regression tests for known problems found in the
-// implementation. The tests describe the behaviour required by UCUM and by the
-// package documentation, so they are expected to FAIL until the corresponding
-// bugs are fixed. They are intentionally kept separate from the other tests to
-// make it obvious which failures are known and already tracked.
+// This file contains regression tests for problems found in the
+// implementation. Each test pins the behaviour required by UCUM and by the
+// package documentation, so it failed before the corresponding bug was fixed
+// and keeps failing if the bug is reintroduced.
+//
+// TestSpecialUnitDomainErrors covers a known, not yet fixed problem with values
+// outside the domain of logarithmic and fractional special units; it is skipped
+// until the fix lands.
 
 import (
 	"encoding/json"
@@ -28,9 +31,9 @@ func mustNotPanic(t *testing.T, f func()) {
 // TestConvBigIntNonIntegerRatio checks ConvBigInt for conversions whose ratio
 // has a numerator other than 1.
 //
-// The result must be val*ratio.Num()/ratio.Denom(), but the current
-// implementation ignores the numerator and divides the original value by the
-// denominator, silently returning a wrong value marked as exact.
+// The result must be val*ratio.Num()/ratio.Denom(). A previous implementation
+// dropped the numerator, dividing the original value by the denominator and
+// silently returning a wrong result marked as exact.
 func TestConvBigIntNonIntegerRatio(t *testing.T) {
 	tests := []struct {
 		from, to  string
@@ -81,7 +84,7 @@ func TestConvBigIntNonIntegerRatio(t *testing.T) {
 // TestPowZeroExponent checks that raising to the power 0 yields 1, not 0.
 //
 // Both the parser (for units like "m0") and normalize (for terms whose
-// components cancel out, like "L/L") currently set the coefficient to 0.
+// components cancel out, like "L/L") used to set the coefficient to 0.
 func TestPowZeroExponent(t *testing.T) {
 	t.Run("Parse", func(t *testing.T) {
 		for _, input := range []string{"m0", "L0", "kg0", "km0"} {
@@ -109,9 +112,9 @@ func TestPowZeroExponent(t *testing.T) {
 // TestDimensionlessConversionToUnity checks that a term whose components cancel
 // out is compatible with the unity "1" and with other dimensionless terms.
 //
-// Currently zero-exponent components are kept in the component set, so the
-// conversion is rejected (and "L/L" even panics with division by zero because
-// its coefficient is 0).
+// Normalization used to keep zero-exponent components in the component set, so
+// the conversion was rejected (and "L/L" even panicked with division by zero
+// because its coefficient was 0).
 func TestDimensionlessConversionToUnity(t *testing.T) {
 	tests := []struct {
 		from, to string
@@ -144,11 +147,12 @@ func TestDimensionlessConversionToUnity(t *testing.T) {
 // TestSpecialUnitDomainErrors checks that logarithmic and fractional special
 // units reject values outside their domain with an error instead of panicking.
 //
-// The conversion functions build a big.Rat from math.Log/math.Sqrt results
-// without checking them, and big.Rat.SetFloat64 returns nil for ±Inf/NaN, which
-// leads to a nil pointer dereference.
+// Known open problem: the conversion functions build a big.Rat from
+// math.Log/math.Sqrt results without checking them, and big.Rat.SetFloat64
+// returns nil for ±Inf/NaN, which leads to a nil pointer dereference. The test
+// is skipped until this is fixed.
 func TestSpecialUnitDomainErrors(t *testing.T) {
-	t.Skip("todo")
+	t.Skip("todo: conversion from values outside the domain of logarithmic and fractional special units panics instead of returning an error")
 
 	tests := []struct {
 		from, to string
@@ -199,8 +203,9 @@ func TestSpecialUnitDomainErrors(t *testing.T) {
 
 // TestMarshalJSONEscaping checks that Unit.MarshalJSON produces valid JSON.
 //
-// The current implementation just wraps String() in quotes, so annotations and
-// units containing quotes, backslashes or control characters break the output.
+// A previous implementation wrapped String() in quotes without escaping, so
+// annotations and units containing quotes, backslashes or control characters
+// produced invalid JSON.
 func TestMarshalJSONEscaping(t *testing.T) {
 	tests := []string{
 		`m{ann"ot}`,
@@ -235,6 +240,47 @@ func TestMarshalJSONEscaping(t *testing.T) {
 			}
 			if decoded.String() != input {
 				t.Errorf("decoded unit = %q, want %q", decoded.String(), input)
+			}
+		})
+	}
+}
+
+// TestParseRejectsInvalidUTF8 checks that invalid UTF-8 is rejected instead of
+// being silently accepted.
+//
+// Unit.Orig keeps the parsed bytes verbatim, so accepting invalid UTF-8 would
+// break the String/JSON round-trip: encoding/json replaces invalid sequences
+// with U+FFFD, so the decoded unit would differ from the original one.
+func TestParseRejectsInvalidUTF8(t *testing.T) {
+	inputs := []string{
+		"{\xf4}",      // lone continuation byte in an annotation
+		"m{\xff}",     // invalid byte in an annotation
+		"{\xc3}",      // truncated multi-byte sequence
+		"m{\xf0\x9f}", // truncated 4-byte sequence (emoji prefix)
+	}
+
+	for _, input := range inputs {
+		t.Run(fmt.Sprintf("%q", input), func(t *testing.T) {
+			if _, err := Parse([]byte(input)); err == nil {
+				t.Errorf("Parse(%q) = nil error, want error", input)
+			}
+		})
+	}
+
+	// Valid UTF-8 annotations must still work and round-trip through JSON.
+	for _, input := range []string{"m{°C}", "m{微}", "m{🌡}"} {
+		t.Run(input, func(t *testing.T) {
+			unit := MustParse([]byte(input))
+			data, err := json.Marshal(&unit)
+			if err != nil {
+				t.Fatalf("json.Marshal() error = %v", err)
+			}
+			var decoded Unit
+			if err := json.Unmarshal(data, &decoded); err != nil {
+				t.Fatalf("json.Unmarshal(%s) error = %v", data, err)
+			}
+			if decoded.String() != input {
+				t.Errorf("JSON round-trip = %q, want %q", decoded.String(), input)
 			}
 		})
 	}

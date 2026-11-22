@@ -7,118 +7,42 @@ import (
 	"testing"
 )
 
-func TestConvRatFloat(t *testing.T) {
-	type testCase struct {
-		A, B    string
-		value   *big.Rat
-		want    *big.Rat
-		inexact bool
+// localConvCases returns exact conversions that are intentionally kept out of
+// the shared matrix: their expected value is a 45-digit decimal that pins the
+// float64 result of math.Tan/math.Atan bit for bit, which is too fragile (and
+// too ugly) to share with the adapter modules.
+func localConvCases() []convCase {
+	want := big.NewRat(5479641287827929, 35184372088832) // 100*math.Tan(1), ≈ 155.7407724654902
+	return []convCase{
+		{A: "rad", B: "[p'diop]", value: big.NewRat(1, 1), want: want},
+		{A: "deg/[pi]", B: "[p'diop]", value: big.NewRat(180, 1), want: want},
 	}
-	tests := []testCase{
-		{
-			A:     "1",
-			B:     "1",
-			value: big.NewRat(100, 1),
-			want:  big.NewRat(100, 1),
-		},
+}
+
+// inexactConvCases returns conversions that cannot live in the shared exact
+// matrix in internal/testcases/conversions.json. They fall into two groups:
+//
+//   - the mathematical result is exact, but the implementation computes it with
+//     float64 math and returns noise: 45 deg -> %[slope] must be 100 but comes
+//     out as 3518437208883199/35184372088832, 2 [hp'_X] must be 1/100 but comes
+//     out as 5764607523034235/576460752303423488, and so on;
+//   - the result is irrational: Np, B -> Np, B[SPL] at 5, B[V] at 3.
+//
+// Both groups are compared with a relative tolerance, see nearlyEqual.
+//
+// [pi] is kept here as well, although [pi] is an exact rational in the
+// generated conversion table: its 63-digit decimal expansion is an artifact of
+// the table and would make the shared matrix depend on the exact number of
+// digits in it, while ucumapd and ucumdecimal already cover high precision in
+// their own precision tests.
+func inexactConvCases() []convCase {
+	return []convCase{
 		{
 			A:       "[pi]",
 			B:       "1",
 			value:   big.NewRat(10, 1),
 			want:    new(big.Rat).SetFloat64(10 * math.Pi),
 			inexact: true,
-		},
-		{
-			A:       "[hnsf'U]",
-			B:       "1",
-			value:   big.NewRat(10, 1),
-			want:    big.NewRat(10, 1),
-			inexact: true,
-		},
-		{
-			A:     "m",
-			B:     "m",
-			value: big.NewRat(100, 1),
-			want:  big.NewRat(100, 1),
-		},
-		{
-			A:     "km",
-			B:     "m",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1000, 1),
-		},
-		{
-			A:     "m",
-			B:     "km",
-			value: big.NewRat(1000, 1),
-			want:  big.NewRat(1, 1),
-		},
-		{
-			A:     "m",
-			B:     "km",
-			value: big.NewRat(100, 1),
-			want:  big.NewRat(1, 10),
-		},
-		{
-			A:     "m2",
-			B:     "km2",
-			value: big.NewRat(1000000, 1),
-			want:  big.NewRat(1, 1),
-		},
-		{
-			A:     "deg/[pi]",
-			B:     "rad",
-			value: big.NewRat(360, 1),
-			want:  big.NewRat(2, 1),
-		},
-		{
-			A:     "Cel",
-			B:     "K",
-			value: big.NewRat(100, 1),
-			want:  big.NewRat(7463, 20), // = 373.15
-		},
-		{
-			A:     "kCel",
-			B:     "kK",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(127315, 100000), // = 1.27315
-		},
-		{
-			A:     "kCel",
-			B:     "K",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(127315, 100),
-		},
-		{
-			A:     "Cel",
-			B:     "[degF]",
-			value: big.NewRat(100, 1),
-			want:  big.NewRat(212, 1),
-		},
-		{
-			// https://www.unitconverters.net/temperature/reaumur-to-celsius.htm
-			A:     "Cel",
-			B:     "[degRe]",
-			value: big.NewRat(125, 1),
-			want:  big.NewRat(100, 1),
-		},
-		{
-			A:     "[degRe]",
-			B:     "K",
-			value: big.NewRat(15, 1),
-			want:  big.NewRat(2919, 10),
-		},
-		{
-			A:     "rad",
-			B:     "[p'diop]",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(5479641287827929, 35184372088832), // 155.740772465, probably should be rechecked
-		},
-		{
-			A:     "deg/[pi]",
-			B:     "[p'diop]",
-			value: big.NewRat(180, 1),
-			want:  big.NewRat(5479641287827929, 35184372088832), // 155.740772465, probably should be rechecked
 		},
 		{
 			A:       "deg",
@@ -156,13 +80,6 @@ func TestConvRatFloat(t *testing.T) {
 			inexact: true,
 		},
 		{
-			A:       "[hp'_C]",
-			B:       "[hp'_X]",
-			value:   big.NewRat(1, 1),
-			want:    big.NewRat(2, 1),
-			inexact: true,
-		},
-		{
 			A:       "[pH]",
 			B:       "mol/l",
 			value:   big.NewRat(3, 1),
@@ -185,23 +102,9 @@ func TestConvRatFloat(t *testing.T) {
 		},
 		{
 			A:       "B",
-			B:       "1",
-			value:   big.NewRat(3, 1),
-			want:    big.NewRat(1000, 1),
-			inexact: true,
-		},
-		{
-			A:       "B",
 			B:       "Np",
 			value:   big.NewRat(10, 1),
 			want:    new(big.Rat).SetFloat64(23.0258509299405),
-			inexact: true,
-		},
-		{
-			A:       "B[SPL]",
-			B:       "Pa",
-			value:   big.NewRat(10, 1),
-			want:    big.NewRat(2, 1),
 			inexact: true,
 		},
 		{
@@ -214,148 +117,19 @@ func TestConvRatFloat(t *testing.T) {
 		{
 			A:       "B[V]",
 			B:       "V",
-			value:   big.NewRat(2, 1),
-			want:    big.NewRat(10, 1),
-			inexact: true,
-		},
-		{
-			A:       "B[V]",
-			B:       "V",
 			value:   big.NewRat(3, 1),
 			want:    new(big.Rat).SetFloat64(31.6227766016838),
 			inexact: true,
 		},
-		{
-			A:       "B[mV]",
-			B:       "V",
-			value:   big.NewRat(8, 1),
-			want:    big.NewRat(10, 1),
-			inexact: true,
-		},
-		{
-			A:       "B[uV]",
-			B:       "V",
-			value:   big.NewRat(16, 1),
-			want:    big.NewRat(100, 1),
-			inexact: true,
-		},
-		{
-			A:       "B[10.nV]",
-			B:       "V",
-			value:   big.NewRat(20, 1),
-			want:    big.NewRat(100, 1),
-			inexact: true,
-		},
-		{
-			A:       "B[W]",
-			B:       "W",
-			value:   big.NewRat(2, 1),
-			want:    big.NewRat(100, 1),
-			inexact: true,
-		},
-		{
-			A:       "B[kW]",
-			B:       "W",
-			value:   big.NewRat(2, 1),
-			want:    big.NewRat(100000, 1),
-			inexact: true,
-		},
-		{
-			A:       "[m/s2/Hz^(1/2)]",
-			B:       "m2/s4/Hz",
-			value:   big.NewRat(2, 1),
-			want:    big.NewRat(4, 1),
-			inexact: true,
-		},
-		{
-			A:     "bit_s",
-			B:     "1",
-			value: big.NewRat(10, 1),
-			want:  big.NewRat(1024, 1),
-		},
-		{
-			A:     "GiBy",
-			B:     "By",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1024*1024*1024, 1),
-		},
-		{
-			// bit is a dimensionless unit in UCUM, so bit = 1
-			A:     "bit",
-			B:     "1",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1, 1),
-		},
-		{
-			// By = 8 bit
-			A:     "By",
-			B:     "bit",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(8, 1),
-		},
-		{
-			A:     "By",
-			B:     "1",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(8, 1),
-		},
-		{
-			A:     "kBy",
-			B:     "kbit",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(8, 1),
-		},
-		{
-			// 8 bit per byte times the binary prefix
-			A:     "KiBy",
-			B:     "bit",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(8*(1<<10), 1),
-		},
-		{
-			// the fix shows up when the unit is a component of a compound unit
-			A:     "bit/s",
-			B:     "1/s",
-			value: big.NewRat(3, 1),
-			want:  big.NewRat(3, 1),
-		},
-		{
-			// 1 GiBy/s = 8 * 2^30 bit/s
-			A:     "Gbit/s",
-			B:     "GiBy/s",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1000000000, 8*(1<<30)),
-		},
-		{
-			// [IU] is defined as [iU]
-			A:     "[IU]",
-			B:     "[iU]",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1, 1),
-		},
-		{
-			// metric prefixes keep the identity of the arbitrary unit
-			A:     "k[iU]",
-			B:     "[iU]",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1000, 1),
-		},
-		{
-			A:     "m[iU]",
-			B:     "[iU]",
-			value: big.NewRat(1, 1),
-			want:  big.NewRat(1, 1000),
-		},
-		{
-			// a term is always convertible to itself, even with an arbitrary unit
-			A:     "[iU]/mL",
-			B:     "[iU]/mL",
-			value: big.NewRat(5, 1),
-			want:  big.NewRat(5, 1),
-		},
 	}
+}
 
-	runTest := func(t *testing.T, tt testCase) {
+func TestConvRatFloat(t *testing.T) {
+	tests := sharedConvCases(t)
+	tests = append(tests, localConvCases()...)
+	tests = append(tests, inexactConvCases()...)
+
+	runTest := func(t *testing.T, tt convCase) {
 		tname := fmt.Sprintf("(%s)%s is (%s)%s", tt.value.String(), tt.A, tt.want.String(), tt.B)
 		t.Run(tname, func(t *testing.T) {
 			A := MustParse([]byte(tt.A))
@@ -466,15 +240,15 @@ func TestConvRatFloat(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		invertedTest := testCase{
+		invertedTest := convCase{
 			A:       tt.B,
 			B:       tt.A,
 			value:   new(big.Rat).Set(tt.want),
 			want:    new(big.Rat).Set(tt.value),
 			inexact: tt.inexact,
 		}
-		runTest(t, tt)
-		runTest(t, invertedTest)
+		t.Run("fwd", func(t *testing.T) { runTest(t, tt) })
+		t.Run("inv", func(t *testing.T) { runTest(t, invertedTest) })
 	}
 }
 
@@ -516,72 +290,89 @@ func TestConvBigInt(t *testing.T) {
 			A := MustParse([]byte(tt.A))
 			B := MustParse([]byte(tt.B))
 
+			// check verifies a single conversion result against the expected
+			// value and exactness. api names the call under test, details is
+			// appended to failure messages.
+			check := func(t *testing.T, api string, got *big.Int, exact bool, err error, details string) {
+				t.Helper()
+				if err != nil {
+					t.Fatalf("%s() error = %v", api, err)
+				}
+				if got.Cmp(tt.want) != 0 {
+					t.Errorf("%s() got = %s, want %s%s", api, got, tt.want, details)
+				}
+				if exact != tt.wantExact {
+					t.Errorf("%s() exact = %t, want %t%s", api, exact, tt.wantExact, details)
+				}
+			}
+
+			// checkRepeated verifies that a second call with the same arguments
+			// returns the same value and exactness, which protects against
+			// occasional state mutations.
+			checkRepeated := func(t *testing.T, api string, got *big.Int, exact bool, got2 *big.Int, exact2 bool) {
+				t.Helper()
+				if got2.Cmp(got) != 0 {
+					t.Errorf("%s(): failed to reproduce results: first time got %s, second time got %s", api, got, got2)
+				}
+				if exact2 != exact {
+					t.Errorf("%s(): failed to reproduce exactness: first time got %t, second time got %t", api, exact, exact2)
+				}
+			}
+
 			t.Run("PairConverter", func(t *testing.T) {
 				converter, err := NewPairConverter(A, B)
 				if err != nil {
 					t.Fatalf("NewPairConverter() error = %v", err)
 				}
-				got, gotExact := converter.ConvBigInt(tt.value)
-				if got.Cmp(tt.want) != 0 {
-					if pc, ok := converter.(*linearConverter); ok {
-						t.Errorf("ConvBigRat() got = %s, want %s; ratio=%s", got.String(), tt.want.String(), pc.ratio.RatString())
-					} else {
-						t.Errorf("ConvBigRat() got = %s, want %s", got.String(), tt.want.String())
-					}
-				}
-				if gotExact != tt.wantExact {
-					t.Errorf("ConvBigInt() gotExact = %t, want %t", gotExact, tt.wantExact)
+				var details string
+				if pc, ok := converter.(*linearConverter); ok {
+					details = "; ratio=" + pc.ratio.RatString()
 				}
 
-				// Check that the same value is returned if the same value is passed.
-				// It protects against occasional state mutations.
-				got2, _ := converter.ConvBigInt(tt.value)
-				if got2.Cmp(got) != 0 {
-					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
-				}
+				got, exact := converter.ConvBigInt(tt.value)
+				check(t, "PairConverter.ConvBigInt", got, exact, nil, details)
+
+				got2, exact2 := converter.ConvBigInt(tt.value)
+				checkRepeated(t, "PairConverter.ConvBigInt", got, exact, got2, exact2)
 			})
 
 			t.Run("Converter", func(t *testing.T) {
 				converter := NewConverter()
-				got, gotExact, err := converter.ConvBigInt(tt.value, tt.A, tt.B)
-				if err != nil {
-					t.Fatalf("NewConverter().ConvBigRat error = %v", err)
-				}
-				if got.Cmp(tt.want) != 0 {
-					t.Errorf("ConvBigRat() got = %s, want %s", got.String(), tt.want.String())
-				}
-				if gotExact != tt.wantExact {
-					t.Errorf("ConvBigInt() gotExact = %t, want %t", gotExact, tt.wantExact)
-				}
+				got, exact, err := converter.ConvBigInt(tt.value, tt.A, tt.B)
+				check(t, "Converter.ConvBigInt", got, exact, err, "")
 
-				// Check that the same value is returned if the same value is passed.
-				// It protects against occasional state mutations.
-				got2, _, _ := converter.ConvBigInt(tt.value, tt.A, tt.B)
-				if got2.Cmp(tt.want) != 0 {
-					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
+				got2, exact2, err := converter.ConvBigInt(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("Converter.ConvBigInt() error = %v", err)
 				}
+				checkRepeated(t, "Converter.ConvBigInt", got, exact, got2, exact2)
 			})
 
 			t.Run("ConvBigInt", func(t *testing.T) {
-				got, gotExact, err := ConvBigInt(tt.value, tt.A, tt.B)
-				if err != nil {
-					t.Fatalf("error = %v", err)
-				}
-				if got.Cmp(tt.want) != 0 {
-					t.Errorf("got = %s, want %s", got.String(), tt.want.String())
-				}
-				if gotExact != tt.wantExact {
-					t.Errorf("gotExact = %t, want %t", gotExact, tt.wantExact)
-				}
+				got, exact, err := ConvBigInt(tt.value, tt.A, tt.B)
+				check(t, "ConvBigInt", got, exact, err, "")
 
-				// Check that the same value is returned if the same value is passed.
-				// It protects against occasional state mutations.
-				got2, _, _ := ConvBigInt(tt.value, tt.A, tt.B)
-				if got2.Cmp(tt.want) != 0 {
-					t.Errorf("failed to reproduce results: first time got %s, second time got %s", got.String(), got2.String())
+				got2, exact2, err := ConvBigInt(tt.value, tt.A, tt.B)
+				if err != nil {
+					t.Fatalf("ConvBigInt() error = %v", err)
 				}
+				checkRepeated(t, "ConvBigInt", got, exact, got2, exact2)
 			})
 		})
+	}
+}
+
+func TestLinearConverterString(t *testing.T) {
+	conv, err := NewPairConverter(MustParse([]byte("m")), MustParse([]byte("km")))
+	if err != nil {
+		t.Fatalf("NewPairConverter() error = %v", err)
+	}
+	linear, ok := conv.(*linearConverter)
+	if !ok {
+		t.Fatalf("NewPairConverter() = %T, want *linearConverter", conv)
+	}
+	if got, want := linear.String(), "ucum.PairConverter(m->km)"; got != want {
+		t.Errorf("String() = %q, want %q", got, want)
 	}
 }
 
