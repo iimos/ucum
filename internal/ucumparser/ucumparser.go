@@ -175,7 +175,7 @@ func pow(base *big.Rat, exp int) {
 		base = base.Inv(base)
 		exp = -exp
 	} else if exp == 0 {
-		base.SetFrac64(0, 1)
+		base.SetFrac64(1, 1)
 	}
 	cpy := new(big.Rat).Set(base)
 	for i := exp; i > 1; i-- {

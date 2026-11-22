@@ -50,7 +50,7 @@ func pow(num *big.Rat, exp int) *big.Rat {
 		cpy = cpy.Inv(cpy)
 		exp = -exp
 	} else if exp == 0 {
-		cpy.SetFrac64(0, 1)
+		cpy.SetFrac64(1, 1)
 	}
 	multiplier := new(big.Rat).Set(cpy)
 	for i := exp; i > 1; i-- {
