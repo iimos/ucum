@@ -9,7 +9,7 @@ import (
 
 // Normalize builds a normalized version of the given unit. Normalized unit consists of base and special units only.
 func _Normalize(unit Unit) Unit {
-	// It's not ready to be exported while we cant generate string representation fot normalised units
+	// It's not ready to be exported while we cant generate string representation for normalised units
 	norm := Unit{u: normalize(unit.u)}
 	// norm.u.Orig = ??? //todo
 	return norm

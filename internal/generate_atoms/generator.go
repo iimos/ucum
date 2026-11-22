@@ -3,10 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/iimos/ucum/internal/xmlparser"
 	"go/format"
 	"log"
 	"math/big"
+
+	"github.com/iimos/ucum/internal/xmlparser"
 )
 
 type Generator struct {
@@ -22,9 +23,6 @@ func (g *Generator) Printf(format string, args ...interface{}) {
 }
 
 func (g *Generator) Generate(data xmlparser.UCUMData) {
-	//for _, p := range data.XML.Prefixes {
-	//	_ = p
-	//}
 	g.Printf("// Code generated; DO NOT EDIT.\n")
 	g.Printf("package %s\n", g.packageName)
 	g.Printf("import \"math/big\"\n")
@@ -34,8 +32,13 @@ func (g *Generator) Generate(data xmlparser.UCUMData) {
 	g.Printf("\n")
 	g.Printf("var Atoms = map[string]types.Atom{\n")
 	for _, unit := range data.Units {
-		g.Printf("%q: {Code: %q, Kind: %q, Metric: %t, Magnitude: %s},\n",
-			unit.FullCode, unit.Code, unit.Kind, unit.Metric, gocodeRat(unit.Magnitude))
+		// Print the Arbitrary field only when it is set to minimize the diff
+		arbitrary := ""
+		if unit.Arbitrary {
+			arbitrary = ", Arbitrary: true"
+		}
+		g.Printf("%q: {Code: %q, Kind: %q, Metric: %t%s, Magnitude: %s},\n",
+			unit.FullCode, unit.Code, unit.Kind, unit.Metric, arbitrary, gocodeRat(unit.Magnitude))
 	}
 	g.Printf("}\n")
 }

@@ -27,6 +27,12 @@ const xmlContent = `
       <property>number</property>
       <value Unit="1" UNIT="1" value="10">10</value>
    </unit>
+   <unit Code="[iU]" CODE="[IU]" isMetric="yes" isArbitrary="yes" class="chemical">
+      <name>international unit</name>
+      <printSymbol>IU</printSymbol>
+      <property>arbitrary</property>
+      <value Unit="1" UNIT="1" value="1">1</value>
+   </unit>
 </root>
 `
 
@@ -41,6 +47,8 @@ func TestParse(t *testing.T) {
 			{Code: "m", FullCode: "m", Kind: "length", Metric: true, Magnitude: big.NewRat(1, 1)},
 			{Code: "m", FullCode: "Ym", Kind: "length", Metric: true, Magnitude: yotta},
 			{Code: "10*", FullCode: "10*", Kind: "number", Metric: false, Magnitude: big.NewRat(1, 1)},
+			{Code: "[iU]", FullCode: "[iU]", Kind: "arbitrary", Metric: true, Arbitrary: true, Magnitude: big.NewRat(1, 1)},
+			{Code: "[iU]", FullCode: "Y[iU]", Kind: "arbitrary", Metric: true, Arbitrary: true, Magnitude: yotta},
 		},
 		XML: XMLRoot{
 			Version:      "2.2",
@@ -65,6 +73,14 @@ func TestParse(t *testing.T) {
 					Value:      XMLValue{Unit: "1", Value: big.NewRat(10, 1)},
 					Class:      "dimless",
 					Metric:     "no",
+				},
+				{
+					XMLConcept:  XMLConcept{Code: "[iU]", CodeUC: "[IU]", Name: []string{"international unit"}, PrintSymbol: "IU"},
+					Property:    "arbitrary",
+					Value:       XMLValue{Unit: "1", Value: big.NewRat(1, 1)},
+					Class:       "chemical",
+					Metric:      "yes",
+					IsArbitrary: "yes",
 				},
 			},
 		},

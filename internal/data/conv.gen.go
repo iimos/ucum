@@ -27,8 +27,8 @@ var Conv = map[string]*types.Unit{
 	"Bi": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0xa}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "C", Annotation: ""}: 1, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
 	// Bq = s⁻¹
 	"Bq": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
-	// By = 8⋅bit
-	"By": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x8}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "bit", Annotation: ""}: 1}},
+	// By = 8
+	"By": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x8}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// Ci = 37000000000⋅s⁻¹
 	"Ci": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x8, 0x9d, 0x5f, 0x32, 0x0}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
 	// F = 1/1000⋅C²⋅s²⋅g⁻¹⋅m⁻²
@@ -87,14 +87,6 @@ var Conv = map[string]*types.Unit{
 	"W": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3, 0xe8}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -3}},
 	// Wb = 1000⋅m²⋅g⋅C⁻¹⋅s⁻¹
 	"Wb": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3, 0xe8}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "C", Annotation: ""}: -1, types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
-	// [APL'U] = 1
-	"[APL'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [AU] = 1
-	"[AU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [Amb'a'1'U] = 1
-	"[Amb'a'1'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [BAU] = 1
-	"[BAU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [Btu] = 1054350⋅m²⋅g⋅s⁻²
 	"[Btu]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x10, 0x16, 0x8e}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
 	// [Btu_39] = 1059670⋅m²⋅g⋅s⁻²
@@ -109,76 +101,36 @@ var Conv = map[string]*types.Unit{
 	"[Btu_m]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x10, 0x1c, 0x7e}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
 	// [Btu_th] = 1054350⋅m²⋅g⋅s⁻²
 	"[Btu_th]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x10, 0x16, 0x8e}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
-	// [CCID_50] = 1
-	"[CCID_50]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [CFU] = 1
-	"[CFU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [Cal] = 4184000⋅m²⋅g⋅s⁻²
 	"[Cal]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3f, 0xd7, 0xc0}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
 	// [Ch] = 1/3000⋅m
 	"[Ch]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0xb, 0xb8})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1}},
-	// [D'ag'U] = 1
-	"[D'ag'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [EID_50] = 1
-	"[EID_50]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [ELU] = 1
-	"[ELU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [EU] = 1
-	"[EU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [FEU] = 1
-	"[FEU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [FFU] = 1
-	"[FFU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [FNU] = 1
 	"[FNU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [GPL'U] = 1
-	"[GPL'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [G] = 66743/1000000000000000000⋅m³⋅g⁻¹⋅s⁻²
 	"[G]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1, 0x4, 0xb7}), (&big.Int{}).SetBytes([]byte{0xd, 0xe0, 0xb6, 0xb3, 0xa7, 0x64, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: -1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 3, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
 	// [HPF] = 1
 	"[HPF]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [HP] = 37284993579113511/50000000000⋅m²⋅g⋅s⁻³
 	"[HP]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x84, 0x76, 0x81, 0xd, 0xbc, 0x5c, 0x27}), (&big.Int{}).SetBytes([]byte{0xb, 0xa4, 0x3b, 0x74, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -3}},
-	// [IR] = 1
-	"[IR]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [IU] = [iU]
 	"[IU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "[iU]", Annotation: ""}: 1}},
 	// [LPF] = 100
 	"[LPF]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x64}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [Lf] = 1
-	"[Lf]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [MET] = 7/120000000000⋅m³⋅g⁻¹⋅s⁻¹
 	"[MET]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x7}), (&big.Int{}).SetBytes([]byte{0x1b, 0xf0, 0x8e, 0xb0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: -1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 3, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
-	// [MPL'U] = 1
-	"[MPL'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [NTU] = 1
 	"[NTU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [PFU] = 1
-	"[PFU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [PNU] = 1
-	"[PNU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [PRU] = 133322000000⋅g⋅s⁻¹⋅m⁻⁴
 	"[PRU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1f, 0xa, 0x9c, 0x46, 0x80}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: -4, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
 	// [S] = 1/10000000000000⋅s
 	"[S]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x9, 0x18, 0x4e, 0x72, 0xa0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "s", Annotation: ""}: 1}},
-	// [TCID_50] = 1
-	"[TCID_50]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [USP'U] = 1
-	"[USP'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [acr_br] = 15808008005469801/3906250000000⋅m²
 	"[acr_br]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x38, 0x29, 0x4c, 0xad, 0xc5, 0xc6, 0x69}), (&big.Int{}).SetBytes([]byte{0x3, 0x8d, 0x7e, 0xa4, 0xc6, 0x80})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
 	// [acr_us] = 62726400000/15499969⋅m²
 	"[acr_us]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0xe, 0x9a, 0xc8, 0xe8, 0x0}), (&big.Int{}).SetBytes([]byte{0xec, 0x82, 0xc1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
-	// [anti'Xa'U] = 1
-	"[anti'Xa'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [arb'U] = 1
-	"[arb'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [bbl_us] = 9936705933/62500000000⋅m³
 	"[bbl_us]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x2, 0x50, 0x46, 0x19, 0x8d}), (&big.Int{}).SetBytes([]byte{0xe, 0x8d, 0x4a, 0x51, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
-	// [bdsk'U] = 1
-	"[bdsk'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [beth'U] = 1
-	"[beth'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [bf_i] = 18435447/7812500000⋅m³
 	"[bf_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1, 0x19, 0x4d, 0x77}), (&big.Int{}).SetBytes([]byte{0x1, 0xd1, 0xa9, 0x4a, 0x20})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
 	// [bu_br] = 454609/12500000⋅m³
@@ -231,8 +183,6 @@ var Conv = map[string]*types.Unit{
 	"[dr_av]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x2, 0xb4, 0x20, 0x85}), (&big.Int{}).SetBytes([]byte{0x1, 0x86, 0xa0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1}},
 	// [drp] = 1/20000000⋅m³
 	"[drp]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1, 0x31, 0x2d, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
-	// [dye'U] = 1
-	"[dye'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [e] = 801088317/5000000000000000000000000000⋅C
 	"[e]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x2f, 0xbf, 0xa3, 0x3d}), (&big.Int{}).SetBytes([]byte{0x10, 0x27, 0xe7, 0x2f, 0x1f, 0x12, 0x81, 0x30, 0x88, 0x0, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "C", Annotation: ""}: 1}},
 	// [eps_0] = 8854187817/1000000000000000000000000⋅C²⋅s²⋅g⁻¹⋅m⁻³
@@ -281,16 +231,6 @@ var Conv = map[string]*types.Unit{
 	"[hd_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x7f}), (&big.Int{}).SetBytes([]byte{0x4, 0xe2})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1}},
 	// [hnsf'U] = 1
 	"[hnsf'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [hp_C] = 1
-	"[hp_C]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [hp_M] = 1
-	"[hp_M]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [hp_Q] = 1
-	"[hp_Q]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [hp_X] = 1
-	"[hp_X]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [iU] = 1
-	"[iU]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [in_br] = 1269999/50000000⋅m
 	"[in_br]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x13, 0x60, 0xef}), (&big.Int{}).SetBytes([]byte{0x2, 0xfa, 0xf0, 0x80})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1}},
 	// [in_i'H2O] = 24908891/100⋅g⋅m⁻¹⋅s⁻²
@@ -303,22 +243,10 @@ var Conv = map[string]*types.Unit{
 	"[in_us]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x64}), (&big.Int{}).SetBytes([]byte{0xf, 0x61})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1}},
 	// [k] = 1380649/100000000000000000000000000⋅m²⋅g⋅K⁻¹⋅s⁻²
 	"[k]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x15, 0x11, 0x29}), (&big.Int{}).SetBytes([]byte{0x52, 0xb7, 0xd2, 0xdc, 0xc8, 0xc, 0xd2, 0xe4, 0x0, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "K", Annotation: ""}: -1, types.ComponentKey{AtomCode: "g", Annotation: ""}: 1, types.ComponentKey{AtomCode: "m", Annotation: ""}: 2, types.ComponentKey{AtomCode: "s", Annotation: ""}: -2}},
-	// [ka'U] = 1
-	"[ka'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [kn_br] = 8043327/15625000⋅m⋅s⁻¹
 	"[kn_br]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x7a, 0xbb, 0x3f}), (&big.Int{}).SetBytes([]byte{0xee, 0x6b, 0x28})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
 	// [kn_i] = 463/900⋅m⋅s⁻¹
 	"[kn_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1, 0xcf}), (&big.Int{}).SetBytes([]byte{0x3, 0x84})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 1, types.ComponentKey{AtomCode: "s", Annotation: ""}: -1}},
-	// [knk'U] = 1
-	"[knk'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [kp_C] = 1
-	"[kp_C]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [kp_M] = 1
-	"[kp_M]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [kp_Q] = 1
-	"[kp_Q]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
-	// [kp_X] = 1
-	"[kp_X]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [lb_ap] = 58319019/156250⋅g
 	"[lb_ap]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3, 0x79, 0xe0, 0xab}), (&big.Int{}).SetBytes([]byte{0x2, 0x62, 0x5a})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1}},
 	// [lb_av] = 45359237/100000⋅g
@@ -345,8 +273,6 @@ var Conv = map[string]*types.Unit{
 	"[m_e]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x15, 0x35, 0x9d, 0xa5, 0x53}), (&big.Int{}).SetBytes([]byte{0x4b, 0x3b, 0x4c, 0xa8, 0x5a, 0x86, 0xc4, 0x7a, 0x9, 0x8a, 0x22, 0x40, 0x0, 0x0, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1}},
 	// [m_p] = 33452438519/20000000000000000000000000000000000⋅g
 	"[m_p]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x7, 0xc9, 0xeb, 0xb3, 0xf7}), (&big.Int{}).SetBytes([]byte{0x3, 0xda, 0x13, 0x7d, 0x5b, 0xf, 0x80, 0x6f, 0x1b, 0x1c, 0xc8, 0x0, 0x0, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1}},
-	// [mclg'U] = 1
-	"[mclg'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [mesh_i] = 5000/127⋅m⁻¹
 	"[mesh_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x13, 0x88}), (&big.Int{}).SetBytes([]byte{0x7f})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: -1}},
 	// [mi_br] = 125729901/78125⋅m
@@ -435,8 +361,6 @@ var Conv = map[string]*types.Unit{
 	"[sft_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x2, 0x37, 0x9}), (&big.Int{}).SetBytes([]byte{0x17, 0xd7, 0x84})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
 	// [sin_i] = 16129/25000000⋅m²
 	"[sin_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3f, 0x1}), (&big.Int{}).SetBytes([]byte{0x1, 0x7d, 0x78, 0x40})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
-	// [smgy'U] = 1
-	"[smgy'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [smi_us] = 40144896000000/15499969⋅m²
 	"[smi_us]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x24, 0x82, 0xf6, 0x44, 0x0, 0x0}), (&big.Int{}).SetBytes([]byte{0xec, 0x82, 0xc1})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
 	// [smoot] = 8509/5000⋅m
@@ -449,14 +373,10 @@ var Conv = map[string]*types.Unit{
 	"[stone_av]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x12, 0xec, 0xe3, 0xa3}), (&big.Int{}).SetBytes([]byte{0xc3, 0x50})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "g", Annotation: ""}: 1}},
 	// [syd_i] = 1306449/1562500⋅m²
 	"[syd_i]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x13, 0xef, 0x51}), (&big.Int{}).SetBytes([]byte{0x17, 0xd7, 0x84})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 2}},
-	// [tb'U] = 1
-	"[tb'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [tbs_m] = 3/200000⋅m³
 	"[tbs_m]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x3}), (&big.Int{}).SetBytes([]byte{0x3, 0xd, 0x40})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
 	// [tbs_us] = 473176473/32000000000000⋅m³
 	"[tbs_us]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1c, 0x34, 0x19, 0x99}), (&big.Int{}).SetBytes([]byte{0x1d, 0x1a, 0x94, 0xa2, 0x0, 0x0})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
-	// [todd'U] = 1
-	"[todd'U]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x1})), Components: map[types.ComponentKey]int{}},
 	// [tsp_m] = 1/200000⋅m³
 	"[tsp_m]": &types.Unit{Coeff: (&big.Rat{}).SetFrac((&big.Int{}).SetBytes([]byte{0x1}), (&big.Int{}).SetBytes([]byte{0x3, 0xd, 0x40})), Components: map[types.ComponentKey]int{types.ComponentKey{AtomCode: "m", Annotation: ""}: 3}},
 	// [tsp_us] = 157725491/32000000000000⋅m³

@@ -279,6 +279,80 @@ func TestConvRatFloat(t *testing.T) {
 			value: big.NewRat(1, 1),
 			want:  big.NewRat(1024*1024*1024, 1),
 		},
+		{
+			// bit is a dimensionless unit in UCUM, so bit = 1
+			A:     "bit",
+			B:     "1",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(1, 1),
+		},
+		{
+			// By = 8 bit
+			A:     "By",
+			B:     "bit",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(8, 1),
+		},
+		{
+			A:     "By",
+			B:     "1",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(8, 1),
+		},
+		{
+			A:     "kBy",
+			B:     "kbit",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(8, 1),
+		},
+		{
+			// 8 bit per byte times the binary prefix
+			A:     "KiBy",
+			B:     "bit",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(8*(1<<10), 1),
+		},
+		{
+			// the fix shows up when the unit is a component of a compound unit
+			A:     "bit/s",
+			B:     "1/s",
+			value: big.NewRat(3, 1),
+			want:  big.NewRat(3, 1),
+		},
+		{
+			// 1 GiBy/s = 8 * 2^30 bit/s
+			A:     "Gbit/s",
+			B:     "GiBy/s",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(1000000000, 8*(1<<30)),
+		},
+		{
+			// [IU] is defined as [iU]
+			A:     "[IU]",
+			B:     "[iU]",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(1, 1),
+		},
+		{
+			// metric prefixes keep the identity of the arbitrary unit
+			A:     "k[iU]",
+			B:     "[iU]",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(1000, 1),
+		},
+		{
+			A:     "m[iU]",
+			B:     "[iU]",
+			value: big.NewRat(1, 1),
+			want:  big.NewRat(1, 1000),
+		},
+		{
+			// a term is always convertible to itself, even with an arbitrary unit
+			A:     "[iU]/mL",
+			B:     "[iU]/mL",
+			value: big.NewRat(5, 1),
+			want:  big.NewRat(5, 1),
+		},
 	}
 
 	runTest := func(t *testing.T, tt testCase) {
@@ -520,6 +594,21 @@ func TestNewPairConverter(t *testing.T) {
 		{"m", "1"}:      `ucum: "m" cannot be converted to "1"`,
 		{"m", "m2"}:     `ucum: "m" cannot be converted to "m2"`,
 		{"m", "1/m"}:    `ucum: "m" cannot be converted to "1/m"`,
+
+		// Arbitrary units are not commensurable with any other unit (UCUM §24, §25).
+		{"bit", "[iU]"}:         `ucum: "bit" cannot be converted to "[iU]"`,
+		{"[iU]", "bit"}:         `ucum: "[iU]" cannot be converted to "bit"`,
+		{"By", "[iU]"}:          `ucum: "By" cannot be converted to "[iU]"`,
+		{"1", "[iU]"}:           `ucum: "1" cannot be converted to "[iU]"`,
+		{"[iU]", "1"}:           `ucum: "[iU]" cannot be converted to "1"`,
+		{"[CFU]", "1"}:          `ucum: "[CFU]" cannot be converted to "1"`,
+		{"[hp_X]", "[hp_C]"}:    `ucum: "[hp_X]" cannot be converted to "[hp_C]"`,
+		{"[iU]", "[arb'U]"}:     `ucum: "[iU]" cannot be converted to "[arb'U]"`,
+		{"[iU]", "[iU]2"}:       `ucum: "[iU]" cannot be converted to "[iU]2"`,
+		{"[iU]/mL", "[CFU]/mL"}: `ucum: "[iU]/mL" cannot be converted to "[CFU]/mL"`,
+		{"[iU]/mL", "[iU]/l"}:   `ucum: "[iU]/mL" cannot be converted to "[iU]/l"`,
+		{"[iU]/mL", "1/mL"}:     `ucum: "[iU]/mL" cannot be converted to "1/mL"`,
+		{"[iU]/[iU]", "1"}:      `ucum: "[iU]/[iU]" cannot be converted to "1"`,
 	}
 
 	for input, wantErr := range tests {

@@ -18,6 +18,7 @@ type Unit struct {
 	FullCode  string
 	Kind      string
 	Metric    bool
+	Arbitrary bool
 	Magnitude *big.Rat
 }
 
@@ -75,11 +76,13 @@ func Parse(reader io.Reader) UCUMData {
 	}
 
 	for _, u := range data.Units {
+		arbitrary := u.IsArbitrary == "yes"
 		addUnit(Unit{
 			Code:      u.Code,
 			FullCode:  u.Code,
 			Kind:      u.Property,
 			Metric:    u.Metric == "yes",
+			Arbitrary: arbitrary,
 			Magnitude: big.NewRat(1, 1),
 		})
 		if u.Metric == "yes" {
@@ -89,6 +92,7 @@ func Parse(reader io.Reader) UCUMData {
 					FullCode:  pref.Code + u.Code,
 					Kind:      u.Property,
 					Metric:    true,
+					Arbitrary: arbitrary,
 					Magnitude: pref.Value.Value,
 				})
 			}

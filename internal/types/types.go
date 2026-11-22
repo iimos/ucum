@@ -19,4 +19,9 @@ type Atom struct {
 	Kind      string
 	Magnitude *big.Rat
 	Metric    bool
+	// Arbitrary marks procedure defined units (UCUM §24). Arbitrary units are
+	// not commensurable with other units, so they must not be expanded into
+	// non-arbitrary units. An alias of another arbitrary unit (e.g. [IU] = [iU])
+	// is the only definition that may still be expanded.
+	Arbitrary bool
 }

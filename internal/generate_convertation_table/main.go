@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/iimos/ucum/internal/types"
-	"github.com/iimos/ucum/internal/ucumparser"
-	"github.com/iimos/ucum/internal/xmlparser"
 	"log"
 	"math/big"
 	"net/http"
@@ -12,6 +9,10 @@ import (
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/iimos/ucum/internal/types"
+	"github.com/iimos/ucum/internal/ucumparser"
+	"github.com/iimos/ucum/internal/xmlparser"
 )
 
 const url = "https://raw.githubusercontent.com/ucum-org/ucum/main/ucum-essence.xml"
@@ -22,10 +23,6 @@ type namedUnit struct {
 }
 
 func main() {
-	//xx := ucumparser.Parse("")
-	//fmt.Printf("%s = %s\n", xx.String(), xx.CanonicalString())
-	//return
-
 	resp, err := (&http.Client{Timeout: 10 * time.Second}).Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -36,23 +33,32 @@ func main() {
 
 	conv := make(map[string]*types.Unit, len(data.XML.Units))
 
+	// Arbitrary units (UCUM §24, §25) are not commensurable with any other unit,
+	// so their definition must not be expanded. Only an alias of another arbitrary
+	// unit (e.g. [IU] = [iU]) is kept, everything else becomes an opaque atom.
+	arbitraryCodes := make(map[string]struct{})
+	for _, xu := range data.XML.Units {
+		if xu.IsArbitrary == "yes" {
+			arbitraryCodes[xu.Code] = struct{}{}
+		}
+	}
+
 	for _, xu := range data.XML.Units {
 		if !xu.Value.IsFunctional() {
 			u, err2 := ucumparser.Parse([]byte(xu.Value.Unit))
 			if err2 != nil {
-				log.Fatalf("ucum.Parse(%s): %s", xu.Value.Unit, err)
+				log.Fatalf("ucum.Parse(%s): %s", xu.Value.Unit, err2)
 			}
 			u.Coeff.Mul(u.Coeff, xu.Value.Value)
+			if xu.IsArbitrary == "yes" && !refersToArbitrary(&u, arbitraryCodes) {
+				continue
+			}
 			conv[xu.Code] = &u
 		} else {
 			fn := xu.Value.Function
 			fmt.Printf("Func: %s(%g %s); IsSpecial=%s\n", fn.Name, fn.Value, fn.Unit, xu.IsSpecial)
 		}
 	}
-
-	//xx := conv["[gr]"]
-	//fmt.Printf("%s = %s\n", xx.String(), xx.CanonicalString())
-	//return
 
 	// Expand every unit until all unit consists only of primitive ones.
 	for {
@@ -61,9 +67,14 @@ func main() {
 			cpy := make(map[types.ComponentKey]int, len(u.Components))
 			for key, exp := range u.Components {
 				u2, ok := conv[key.AtomCode]
-				if !ok || isOne(u2) {
+				switch {
+				case !ok:
+					// Unknown/primitive atom, keep it as is.
 					cpy[key] += exp
-				} else {
+				case isOne(u2):
+					// The referenced unit is dimensionless (e.g. bit = 1),
+					// so it contributes nothing but a factor of one.
+				default:
 					nothingDone = false
 					u.Coeff.Mul(u.Coeff, pow(u2.Coeff, exp))
 					for key2, exp2 := range u2.Components {
@@ -115,6 +126,18 @@ func isOne(u *types.Unit) bool {
 		return false
 	}
 	return u.Coeff.Cmp(big.NewRat(1, 1)) == 0
+}
+
+// refersToArbitrary reports whether the definition of an arbitrary unit refers to
+// another arbitrary unit, as in [IU] = [iU]. Such an alias is the only definition
+// of an arbitrary unit that is kept in the conversion table.
+func refersToArbitrary(u *types.Unit, arbitraryCodes map[string]struct{}) bool {
+	for key := range u.Components {
+		if _, ok := arbitraryCodes[key.AtomCode]; ok {
+			return true
+		}
+	}
+	return false
 }
 
 func pow(num *big.Rat, exp int) *big.Rat {

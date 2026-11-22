@@ -25,6 +25,16 @@ func NewPairConverter(from, to Unit) (PairConverter, error) {
 	a := _Normalize(from).u
 	b := _Normalize(to).u
 
+	// Arbitrary units are not commensurable with any other unit or term (UCUM §24■3, §25■1),
+	// so any term containing one cannot be converted. The only exceptions are the same term
+	// converted to itself and the very same arbitrary unit atom on both sides, possibly with
+	// a different prefix (e.g. [IU] -> [iU], k[iU] -> [iU]), which is just a scale factor.
+	if containsArbitrary(a) || containsArbitrary(b) {
+		if !sameArbitraryAtom(a, b) && !sameUnit(a, b) {
+			return nil, fmt.Errorf("ucum: %q cannot be converted to %q", from.String(), to.String())
+		}
+	}
+
 	if len(a.Components) != len(b.Components) {
 		// Special units are not normalizable so if number of components doesn't match it might be that units are special
 		specConv, ok := newSpecialConverter(a, b)
@@ -56,6 +66,54 @@ func NewPairConverter(from, to Unit) (PairConverter, error) {
 		ratio:      *ratio,
 		ratioFloat: ratioFloat,
 	}, nil
+}
+
+// containsArbitrary reports whether the unit contains an arbitrary unit atom.
+func containsArbitrary(u types.Unit) bool {
+	for key := range u.Components {
+		if atom, ok := data.Atoms[key.AtomCode]; ok && atom.Arbitrary {
+			return true
+		}
+	}
+	return false
+}
+
+// sameArbitraryAtom reports whether both units are the very same arbitrary unit atom,
+// possibly with a different prefix (e.g. [IU] and [iU], k[iU] and [iU]).
+func sameArbitraryAtom(a, b types.Unit) bool {
+	aCode, aOk := singleArbitraryAtom(a)
+	bCode, bOk := singleArbitraryAtom(b)
+	return aOk && bOk && aCode == bCode
+}
+
+func singleArbitraryAtom(u types.Unit) (string, bool) {
+	if len(u.Components) != 1 {
+		return "", false
+	}
+	for key, exp := range u.Components {
+		if exp != 1 {
+			return "", false
+		}
+		atom, ok := data.Atoms[key.AtomCode]
+		if !ok || !atom.Arbitrary {
+			return "", false
+		}
+		return key.AtomCode, true
+	}
+	return "", false
+}
+
+// sameUnit reports whether both units are the same normalized unit.
+func sameUnit(a, b types.Unit) bool {
+	if a.Coeff.Cmp(b.Coeff) != 0 || len(a.Components) != len(b.Components) {
+		return false
+	}
+	for key, expA := range a.Components {
+		if expB, ok := b.Components[key]; !ok || expA != expB {
+			return false
+		}
+	}
+	return true
 }
 
 // newSpecialConverter creates convertor for special units.
