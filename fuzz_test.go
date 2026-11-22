@@ -28,6 +28,10 @@ func FuzzParse(f *testing.F) {
 		`m{ann"ot}`,
 		`m{a\b}`,
 		"m{a\tb}",
+		// invalid UTF-8 must be rejected, not silently replaced with U+FFFD
+		"{\xff}",
+		"m{\xf4}",
+		"m\xc3",
 	}
 
 	for _, seed := range seeds {

@@ -110,6 +110,11 @@ func TestParseErrors(t *testing.T) {
 		"Cel/s":                            `ucum: invalid unit: non-ratio unit 'Cel' cannot be combined with other units`,
 		"Cel2":                             `ucum: invalid unit: non-ratio unit 'Cel' cannot be raised to a power`,
 		"Cel-1":                            `ucum: invalid unit: non-ratio unit 'Cel' cannot be raised to a power`,
+		// Units are stored verbatim and returned by String and MarshalJSON, so
+		// invalid UTF-8 is rejected instead of being silently replaced with U+FFFD.
+		"{\xff}":  `ucum: invalid UTF-8 in unit`, // invalid byte
+		"m{\xf4}": `ucum: invalid UTF-8 in unit`, // truncated multi-byte sequence
+		"m\xc3":   `ucum: invalid UTF-8 in unit`, // truncated multi-byte sequence
 	}
 
 	for input, wantErr := range tests {
