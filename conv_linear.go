@@ -13,12 +13,13 @@ func (c *linearConverter) ConvBigRat(val *big.Rat) *big.Rat {
 }
 
 func (c *linearConverter) ConvBigInt(val *big.Int) (converted *big.Int, exact bool) {
-	ret := new(big.Int).Mul(val, c.ratio.Num())
+	num := new(big.Int).Mul(val, c.ratio.Num())
 	if c.ratio.IsInt() {
-		return ret, true
+		return num, true
 	}
-	_, rem := ret.QuoRem(val, c.ratio.Denom(), new(big.Int))
-	return ret, rem.Cmp(bigZero) == 0
+	quo, rem := new(big.Int), new(big.Int)
+	quo.QuoRem(num, c.ratio.Denom(), rem)
+	return quo, rem.Sign() == 0
 }
 
 func (c *linearConverter) ConvFloat64(val float64) float64 {
