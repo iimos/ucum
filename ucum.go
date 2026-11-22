@@ -64,27 +64,23 @@ func MustParse(unit []byte) Unit {
 // MarshalJSON encodes the Unit as JSON.
 // It implements the json.Marshaler interface.
 func (u *Unit) MarshalJSON() ([]byte, error) {
-	str := "\"" + u.String() + "\""
-	return []byte(str), nil
+	return json.Marshal(u.String())
 }
 
 // UnmarshalJSON decodes a JSON encoded Unit.
 // It implements the json.Unmarshaler interface.
-func (u *Unit) UnmarshalJSON(bytes []byte) error {
-	if string(bytes) == "null" {
+func (u *Unit) UnmarshalJSON(data []byte) error {
+	if string(data) == "null" {
 		return nil
 	}
-	unit, err := Parse(unquote(bytes))
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		return fmt.Errorf("ucum: error decoding string '%s': %s", string(data), err)
+	}
+	unit, err := Parse([]byte(str))
 	if err != nil {
-		return fmt.Errorf("ucum: error decoding string '%s': %s", string(bytes), err)
+		return fmt.Errorf("ucum: error decoding string '%s': %s", string(data), err)
 	}
 	*u = unit
 	return nil
-}
-
-func unquote(bytes []byte) []byte {
-	if len(bytes) >= 2 && bytes[0] == '"' && bytes[len(bytes)-1] == '"' {
-		return bytes[1 : len(bytes)-1]
-	}
-	return bytes
 }
