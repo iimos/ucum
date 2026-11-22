@@ -41,6 +41,20 @@ func normalize(unit types.Unit) types.Unit {
 			ret.Components[key2] += exponent * exponent2
 		}
 	}
+
+	// Components that cancel out must not stay in the component set: a term
+	// like "m/m" is dimensionless and has to be compatible with "1".
+	// Arbitrary units are the exception: even a cancelled arbitrary unit keeps
+	// its term incommensurable with everything else (UCUM §24■3, §25■1).
+	for key, exponent := range ret.Components {
+		if exponent != 0 {
+			continue
+		}
+		if atom, ok := data.Atoms[key.AtomCode]; ok && atom.Arbitrary {
+			continue
+		}
+		delete(ret.Components, key)
+	}
 	return ret
 }
 
