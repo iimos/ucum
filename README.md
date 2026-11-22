@@ -1,6 +1,6 @@
 # UCUM
 
-[UCUM](https://ucum.org) (Unified Code for Units of Measure) is a code system intended to cover all units of measures.
+[UCUM](https://ucum.org/ucum) (Unified Code for Units of Measure) is a code system intended to cover all units of measures.
 It provides a formalism to express units in an unambiguous way suitable for electronic communication.
 
 Features

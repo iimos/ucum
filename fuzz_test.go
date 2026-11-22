@@ -1,6 +1,7 @@
 package ucum
 
 import (
+	"encoding/json"
 	"testing"
 )
 
@@ -16,6 +17,17 @@ func FuzzParse(f *testing.F) {
 		" ",
 		"{}",
 		"1/0",
+		"m/m",
+		"m0",
+		"Cel",
+		"[iU]",
+		"[IU]",
+		"[m/s2/Hz^(1/2)]",
+		"m[H2O]",
+		"10*",
+		`m{ann"ot}`,
+		`m{a\b}`,
+		"m{a\tb}",
 	}
 
 	for _, seed := range seeds {
@@ -46,6 +58,19 @@ func FuzzParse(f *testing.F) {
 			jsonBytes, err := unit.MarshalJSON()
 			if err != nil {
 				t.Errorf("MarshalJSON failed for valid unit %q: %v", string(input), err)
+			}
+
+			// The output must be valid JSON, not just something that our own
+			// UnmarshalJSON happens to accept.
+			if !json.Valid(jsonBytes) {
+				t.Errorf("MarshalJSON returned invalid JSON for unit %q: %s", string(input), jsonBytes)
+			}
+
+			var str string
+			if err := json.Unmarshal(jsonBytes, &str); err != nil {
+				t.Errorf("json.Unmarshal failed for unit %q: %v", string(input), err)
+			} else if str != unit.String() {
+				t.Errorf("JSON string round-trip mismatch: original=%q, after=%q", unit.String(), str)
 			}
 
 			var unit2 Unit
