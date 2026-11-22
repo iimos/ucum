@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/big"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/iimos/ucum/internal/data"
 	"github.com/iimos/ucum/internal/types"
@@ -21,6 +22,14 @@ var (
 func Parse(unit []byte) (types.Unit, error) {
 	if len(unit) == 0 {
 		return types.Unit{}, fmt.Errorf("ucum: empty unit")
+	}
+	// Unit strings are stored verbatim and exposed via String and MarshalJSON,
+	// so they have to be valid UTF-8: JSON cannot represent arbitrary bytes and
+	// invalid sequences would silently turn into U+FFFD on the way through.
+	// Only annotations may contain non-ASCII characters, but validating the
+	// whole input is cheap and keeps the guarantee trivially obvious.
+	if !utf8.Valid(unit) {
+		return types.Unit{}, fmt.Errorf("ucum: invalid UTF-8 in unit")
 	}
 	p := newParser(unit)
 	p.readTerm(false, 1)
